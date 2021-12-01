@@ -30,6 +30,5 @@ fn larger(path: &str) -> Result<i64, Error> {
 }
 
 fn main() {
-    let pepe = larger("input");
-    println!("{:?}", pepe);
+    println!("{:?}", larger("input"));
 }
