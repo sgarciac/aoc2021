@@ -44,7 +44,6 @@
     (loop for line = (read-line stream nil)
           while line collect (parse-path line))))
 
-
 ;; sparse 2-d matrix
 (defun make-coords ()
   (make-hash-table :test 'equal))
@@ -58,8 +57,6 @@
       (incf (gethash point coords))
       (setf (gethash point coords) 1)))
 
-
-
 ;; misc
 (defun remove-diagonals (paths)
   (remove-if #'diagonal-p paths))
@@ -68,6 +65,14 @@
 (loop
   with coords = (make-coords)
   for path in (remove-diagonals (read-input))
+  do (each-point path (lambda (point) (incf-point-count coords point)))
+  finally (return
+            (loop for k being the hash-keys in coords using (hash-value v) counting (> v 1))))
+
+;; Part 2
+(loop
+  with coords = (make-coords)
+  for path in (read-input)
   do (each-point path (lambda (point) (incf-point-count coords point)))
   finally (return
             (loop for k being the hash-keys in coords using (hash-value v) counting (> v 1))))
