@@ -32,12 +32,17 @@
   (labels ((path-step (from to) (cond ((= from to) 0) ((< from to) 1) (t -1))))
     (let ((step-x (path-step (x (path-p1 path)) (x (path-p2 path))))
           (step-y (path-step (y (path-p1 path)) (y (path-p2 path)))))
-      (loop for x = (x (path-p1 path)) then (+ x step-x)
-            and y = (y (path-p1 path)) then (+ y step-y) until (and (= y (y (path-p2 path)))
-                                                                    (= x (x (path-p2 path))))
-            do (funcall predicate (make-point x y))
-            finally (funcall predicate (make-point x y))
-            ))))
+      (loop
+        for x = (x (path-p1 path)) then (+ x step-x)
+        and y = (y (path-p1 path)) then (+ y step-y)
+
+        until (and (= y (y (path-p2 path)))
+                   (= x (x (path-p2 path))))
+
+        do (funcall predicate (make-point x y))
+
+        finally (funcall predicate (make-point x y)) ;; one last call.
+        ))))
 
 (defun read-input ()
   (with-open-file (stream *input-file*)
