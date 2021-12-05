@@ -61,18 +61,16 @@
 (defun remove-diagonals (paths)
   (remove-if #'diagonal-p paths))
 
+(defun count-points-with-intersections (paths)
+  (loop
+    with coords = (make-coords)
+    for path in paths
+    do (each-point path (lambda (point) (incf-point-count coords point)))
+    finally (return
+              (loop for k being the hash-keys in coords using (hash-value v) counting (> v 1)))))
+
 ;; Part 1
-(loop
-  with coords = (make-coords)
-  for path in (remove-diagonals (read-input))
-  do (each-point path (lambda (point) (incf-point-count coords point)))
-  finally (return
-            (loop for k being the hash-keys in coords using (hash-value v) counting (> v 1))))
+(count-points-with-intersections (remove-diagonals (read-input)))
 
 ;; Part 2
-(loop
-  with coords = (make-coords)
-  for path in (read-input)
-  do (each-point path (lambda (point) (incf-point-count coords point)))
-  finally (return
-            (loop for k being the hash-keys in coords using (hash-value v) counting (> v 1))))
+(count-points-with-intersections (read-input))
