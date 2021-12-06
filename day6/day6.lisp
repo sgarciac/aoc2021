@@ -29,13 +29,14 @@
     finally (return simulation)))
 
 ;; part 1
-(let ((simulation (read-simulation *input-file*)))
-  (dotimes (i 80)
-    (setf simulation (advance simulation)))
-  (loop for val across simulation summing val))
+(defun simulate (rounds)
+  (let ((simulation (read-simulation *input-file*)))
+    (dotimes (i rounds)
+      (setf simulation (advance simulation)))
+    (loop for val across simulation summing val)))
 
-;;
-(let ((simulation (read-simulation *input-file*)))
-  (dotimes (i 256)
-    (setf simulation (advance simulation)))
-  (loop for val across simulation summing val))
+;; part 1
+(simulate 80)
+
+;; part 2
+(simulate 256)
