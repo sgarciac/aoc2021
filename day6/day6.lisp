@@ -2,7 +2,6 @@
 
 (defparameter *input-file* "./input")
 
-
 (defun make-simulation ()
   (make-array 9 :initial-element 0))
 

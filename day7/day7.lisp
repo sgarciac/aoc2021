@@ -40,5 +40,5 @@
   for i from 0 upto last
   minimizing
   (loop for j from 0 below (length crabs)
-        summing (let ((diff (abs (- i (aref crabs j)))))
-                  (/ (* diff (1+ diff)) 2))))
+        summing (let ((distance (abs (- i (aref crabs j)))))
+                  (/ (* distance (1+ distance)) 2))))
