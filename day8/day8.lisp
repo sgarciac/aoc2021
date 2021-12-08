@@ -20,12 +20,14 @@
 ;; appearances
 ;;
 ;; a: 8
-;; b: 6 * (0 4 5 6 8 9)
+;; b: 6 * (appears in: 0 4 5 6 8 9)
 ;; c: 8
 ;; d: 7
-;; e: 4 * (0 2 6 8
-;; f: 9 * (0 1 3 4 5 6 7 8 9)
+;; e: 4 * (appears in: 0 2 6 8)
+;; f: 9 * (appears in: 0 1 3 4 5 6 7 8 9)
 ;; g: 7
+;;
+;; * = unique number of appearances
 
 ;; we can identify b,e,f counting apperances
 ;; By having number 1 and f, we can identify c (the other one)
