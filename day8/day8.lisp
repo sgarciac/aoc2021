@@ -17,7 +17,7 @@
 ;; e f
 ;;  g
 ;;
-;; apperances
+;; appearances
 ;;
 ;; a: 8
 ;; b: 6 * (0 4 5 6 8 9)
