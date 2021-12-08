@@ -72,11 +72,6 @@
 (defun find-by-appearances (appearances number)
   (loop for (s . n) in appearances when (= number n) collect s ))
 
-(find-by-appearances  (count-appearances (get-sample-from-line
-                                          "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe")
-                                         ) 8)
-
-
 (defun signal-sample-contains-all (ss &rest signals)
   (loop for s in signals always (find s ss)))
 
