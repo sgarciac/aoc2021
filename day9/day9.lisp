@@ -1,7 +1,7 @@
-(defparameter *input-file* "example")
+(defparameter *input-file* "input")
 
-(defparameter *rows* 5)
-(defparameter *cols* 10)
+(defparameter *rows* 100)
+(defparameter *cols* 100)
 
 ;; variables
 
@@ -72,29 +72,59 @@
   (push p (gethash b *basins*))
   (setf (gethash p *locations-basins*) b))
 
+(defun merge-into (b1 b2)
+  "merge entries of b2 into b1, remove b2"
+  (loop for location in (gethash b2 *basins*)
+        do
+           (push-to-basin b1 location))
+  (remhash b2 *basins*))
+
 (defun init2 ()
   (setf *basins* (make-hash-table))
   (setf *locations-basins* (make-hash-table :test #'equal))
-  (init))
+  (init)
+  ;; init the basins
+  (loop for row from 0 below *rows*
+        do (loop for col from 0 below *cols*
+                 do (let* ((p (cons row col))
+                           (pu (get-up p))
+                           (pd (get-down p))
+                           (pl (get-left p))
+                           (pr (get-right p))
+                           (h (get-height p))
+                           (u (get-height-up p))
+                           (l (get-height-left p)))
+                      (when (not (= h 9))
+                        (cond
+                          ;; up and left not bassins
+                          ;; init a new basin
+                          ((and
+                            (or (not pu) (= u 9) )
+                            (or (not pl) (= l 9) ))
+                           (init-basin p))
+                          ;; up is not a bassin, left is a basin
+                          ;; push location into left basin
+                          ((or (not pu) (= u 9) )
+                           (push-to-basin (gethash pl *locations-basins*) p))
+                          ;; left is not a basin, up is a basin
+                          ;; push location into up basin
+                          ((or (not pl) (= l 9) )
+                           (push-to-basin (gethash pu *locations-basins*) p))
+                          ;; left and up are the same basin
+                          ;; push location into basin
+                          ((eq  (gethash pl *locations-basins*) (gethash pu *locations-basins*))
 
-(loop for row from 0 below *rows*
-      do (loop for col from 0 below *cols*
-               do (let* ((p (cons row col))
-                         (h (get-height p))
-                         (u (get-height-up p))
-                         (l (get-height-left p)))
-                    (when (not (= h 9))
-                      (cond
-                        ;; init a new basin
-                        ((and
-                          (or (= u 9) (not u))
-                          (or (= l 9) (not l)))
-                         (setf (gethash (gensym) *basins*) (list p))
-                         (setf)
-                         )
+                           (push-to-basin (gethash pu *locations-basins*) p))
+                          ;; default: left and up are different basins,
+                          ;; merge up basin into left basin and insert location
+                          (t (merge-into (gethash pl *locations-basins*) (gethash pu *locations-basins*))
+                             (push-to-basin (gethash pl *locations-basins*) p))))))))
 
-                        ))
 
-                    )
-               )
-      )
+(init2)
+
+(apply #'* (mapcar #'length (subseq
+                             (sort (loop for v being the hash-values in *basins* collect v)
+                                   (lambda (x y) (>= (length x)
+                                                     (length y))))
+                             0 3)))
