@@ -1,5 +1,3 @@
-(ql:quickload :cl-ppcre)
-
 (defparameter *input-file* "input")
 
 (defun open-char-p (char) (find char '(#\( #\{ #\[ #\<)))
