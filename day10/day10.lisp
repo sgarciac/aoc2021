@@ -5,7 +5,7 @@
 (defun close-for (char) (case char (#\( #\)) (#\{ #\}) (#\[ #\]) (#\< #\>)))
 
 (defun valid-p (chars stack)
-  "returns one of: :OK, :INCOMPLETE and the stack, :CORRUPT and the first corrupt char"
+  "returns one of: 1) :OK, 2) :INCOMPLETE and the stack, 3) :CORRUPT and the first corrupt char"
   (cond
     ((and (not chars) (not stack)) :OK)
     ((and stack (not chars)) (values :INCOMPLETE stack))
@@ -42,8 +42,7 @@
         for chars = (loop for char across line collect char)
         when (multiple-value-bind (result aux)
                  (valid-p chars '())
-               (if (eq result :INCOMPLETE)
-                   (stack-value aux)
-                   nil)) collect it into scores
+               (when (eq result :INCOMPLETE) (stack-value aux)
+                     )) collect it into scores
         finally (return (let ((sorted (sort scores #'>)))
                           (nth (floor (/ (length sorted) 2)) sorted)))))
