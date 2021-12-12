@@ -94,6 +94,6 @@
 ;; part 2
 (init)
 (loop
-  for i from 1 to 100000
+  for i = 1 then (1+ i)
   until (= (dostep) 100)
   finally (return i))
