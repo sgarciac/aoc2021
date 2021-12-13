@@ -16,25 +16,28 @@
                (push p1 (gethash p2 graph)))
           finally (return graph))))
 
-(defun valid-step-p (node visited max-dup)
-  (or
-   (not (find node visited))
-   (and
-    (not (eq node '|start|))
-    (< (- (length visited) (length (remove-duplicates visited))) max-dup))))
+(defun has-duplicated (nodes)
+  (> (- (length nodes) (length (remove-duplicates nodes))) 0))
 
-(defun paths (graph visited start end max-dup)
+(defun valid-step-p (node visited has-dups allow-dups)
+  (and (not (eq node '|start|))
+       (or
+        (not (find node visited))
+        (and allow-dups (not has-dups)))))
+
+(defun paths (graph visited has-dups start end allows-dups)
   (if (eq start end)
       '(nil)
       (loop
         with updated-visited = (if (bigp start) visited (cons start visited))
+        with updated-has-dups = (or has-dups (has-duplicated updated-visited))
         for node in (gethash start graph)
-        when (valid-step-p node updated-visited max-dup)
+        when (valid-step-p node updated-visited updated-has-dups allows-dups)
           append (mapcar (lambda (path) (cons node path))
-                         (paths graph updated-visited node end max-dup)))))
+                         (paths graph updated-visited updated-has-dups node end allows-dups)))))
 
 ;; part 1
-(length (paths (read-input) '() '|start| '|end| 0))
+(length (paths (read-input) '() nil '|start| '|end| nil))
 
 ;; part 2
-(length (paths (read-input) '() '|start| '|end| 1))
+(time (length (paths (read-input) '() nil '|start| '|end| t)))
