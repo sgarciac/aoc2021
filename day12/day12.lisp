@@ -13,8 +13,7 @@
           do (let ((p1 (car line-parts))
                    (p2 (cdr line-parts)))
                (push p2 (gethash p1 graph))
-               (push p1 (gethash p2 graph))
-               )
+               (push p1 (gethash p2 graph)))
           finally (return graph))))
 
 (defun valid-node-p (node visited max-dup)
