@@ -17,7 +17,7 @@
           finally (return graph))))
 
 (defun has-duplicated (nodes)
-  (> (- (length nodes) (length (remove-duplicates nodes))) 0))
+  (not (equal (remove-duplicates nodes) nodes)))
 
 (defun valid-step-p (node visited has-dups allow-dups)
   (and (not (eq node '|start|))
