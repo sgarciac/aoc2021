@@ -22,17 +22,14 @@
    (not (find node visited))
    (and
     (not (eq node '|start|))
-    (< (- (length visited) (length (remove-duplicates visited))) max-dup)
-    )))
+    (< (- (length visited) (length (remove-duplicates visited))) max-dup))))
 
 (defun paths (graph visited start end max-dup)
   (if (eq start end)
       '(nil)
       (loop
         for node in (gethash start graph)
-        for updated-visited = (if (bigp start)
-                                  visited
-                                  (cons start visited))
+        for updated-visited = (if (bigp start) visited (cons start visited))
         when (valid-node-p node updated-visited max-dup)
           append (mapcar (lambda (path) (cons node path))
                          (paths graph updated-visited node end max-dup)))))
