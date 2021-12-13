@@ -16,7 +16,7 @@
                (push p1 (gethash p2 graph)))
           finally (return graph))))
 
-(defun valid-node-p (node visited max-dup)
+(defun valid-step-p (node visited max-dup)
   (or
    (not (find node visited))
    (and
@@ -27,16 +27,14 @@
   (if (eq start end)
       '(nil)
       (loop
+        with updated-visited = (if (bigp start) visited (cons start visited))
         for node in (gethash start graph)
-        for updated-visited = (if (bigp start) visited (cons start visited))
-        when (valid-node-p node updated-visited max-dup)
+        when (valid-step-p node updated-visited max-dup)
           append (mapcar (lambda (path) (cons node path))
                          (paths graph updated-visited node end max-dup)))))
 
 ;; part 1
-(length (let ((graph (read-input)))
-          (paths graph '() '|start| '|end| 0)))
+(length (paths (read-input) '() '|start| '|end| 0))
 
 ;; part 2
-(length (let ((graph (read-input)))
-          (paths graph '() '|start| '|end| 1)))
+(length (paths (read-input) '() '|start| '|end| 1))
