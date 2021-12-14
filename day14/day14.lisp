@@ -53,6 +53,7 @@
                (incf (gethash (char pair 0) counts)  v)
                (setf  (gethash (char pair 0) counts) v))
         finally (progn
+                  ;; count also the last character in the template:
                   (incf (gethash (aref template (1- (length template))) counts))
                   (return counts))))
 
