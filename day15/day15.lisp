@@ -2,11 +2,11 @@
 
 (defparameter *size* 100)
 
-
 (defvar *risk*)
 (defvar *path-risk*) ; cell value nil if not determined
 (defvar *path*) ; cell value nil if not determined, 0 if origin
 (defvar *frontier*)
+
 
 (defun read-input ()
   (with-open-file (stream *input-file*)
@@ -49,37 +49,33 @@
 (defun unexplored-neighboors (p)
   (mapcan (lambda (n) (when (not (explored-p n)) (list n))) (neighboors p)))
 
-;; (defun recalculate-frontier (p)
-;;   "recalculate the frontier, excluding the neighboors of n that are no longer part of it"
-;;   (loop for p in (neighboors p) when (zerop (length (unexplored-neighboors p))) collect p into toremove
-;;         finally (setf *frontier* (nset-difference *frontier* toremove :test #'equal))))
-
-(defun recalculate-frontier ()
-  (loop for p in *frontier* when (zerop (length (unexplored-neighboors p))) collect p into toremove
+(defun recalculate-frontier (old expansion)
+  (loop for n in (append (neighboors old) (neighboors expansion)) when (zerop (length (unexplored-neighboors n))) collect n into toremove
         finally (setf *frontier* (nset-difference *frontier* toremove :test #'equal))))
 
+;; (defun recalculate-frontier ()
+;;   (loop for p in *frontier* when (zerop (length (unexplored-neighboors p))) collect p into toremove
+;;         finally (setf *frontier* (nset-difference *frontier* toremove :test #'equal))))
 
 (defun expand-frontier-at (p)
   (loop for n in (unexplored-neighboors p)
         do (progn
              (set-pref *path-risk* n (+ (pref *path-risk* p) (pref *risk* n)))
              (set-pref *path* n p)
-             (push n *frontier*))
-        finally (recalculate-frontier)
-        ))
+             (push n *frontier*)
+             (recalculate-frontier p n)
+             )))
 
 (defun expand-frontier ()
   (expand-frontier-at (minimum-in-frontier))
   *frontier*
   )
 
-;; part 1
+;;part 1
 (init)
 (time (loop while (expand-frontier)
             do (print (length *frontier*))
             ))
-
-(aref *path-risk* (1- *size*) (1- *size*))
 
 ;; part 2
 (defparameter *ext* 5)
@@ -112,5 +108,4 @@
 (time
  (let ((*size* (* *ext* *size*))) ; <- hooray for dynamic scoping!
    (loop while (expand-frontier))
-   (aref *path-risk* (1- *size*) (1- *size*))
-   ))
+   (aref *path-risk* (1- *size*) (1- *size*))))
