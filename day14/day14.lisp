@@ -18,39 +18,59 @@
                           (middle (second parts))
                           )
                      (setf (gethash pair rules)
-                           (format nil "~A~A"  (char pair 0) middle)))
+                           (cons (format nil "~A~A"  (char pair 0) middle)
+                                 (format nil "~A~A" middle (char pair 1)))))
                 finally (return rules))))))
 
-(defun apply-rules (rs s)
-  (with-output-to-string (stream)
+(defun template-to-pairs-count (template rules)
+  (let ((pc (make-hash-table :test #'equal)))
+    ;; init to 0 all counts
+    (loop for rule being the hash-keys in rules
+          do (setf (gethash rule pc) 0))
+
+    ;; count in template
     (loop
-      for i from 0 below (1- (length s))
-      for rulesub = (gethash (subseq s i (+ 2 i)) rs)
-      do (princ (or rulesub (char s i)) stream)
-      finally (princ (char s (1- (length s))) stream))))
+      for i from 0 below (1- (length template))
+      for current-pair = (format nil "~A~A" (aref template i) (aref template (1+ i)))
+      do (incf (gethash current-pair pc))
+      finally (return pc))))
 
-(defun apply-rules-n (rs s n)
-  (loop for i from 1 to n
-        for result = (apply-rules rs s) then (apply-rules rs result)
-        do (print result)
-        finally (return result)))
+(defun next-pairs-count (pc rules)
+  (let ((npc (make-hash-table :test #'equal)))
+    (loop for rule being the hash-keys in rules
+          do (setf (gethash rule npc) 0))
+    (loop
+      for k being the hash-keys in pc using (hash-value v)
+      do (progn
+           (incf (gethash (car (gethash k rules)) npc) (gethash k pc))
+           (incf (gethash (cdr (gethash k rules)) npc) (gethash k pc))))
+    npc))
 
-(defun score (s)
-  (loop
-    with counts = (make-hash-table)
-    for c across s
-    do (if (gethash c counts)
-           (incf (gethash c counts))
-           (setf (gethash c counts) 1))
-    finally (return (loop for k being the hash-keys in counts using (hash-value v)
-                          maximizing v into max
-                          minimizing v into min
-                          finally (return (- max min))))))
+(defun score (pc template)
+  (loop with counts = (make-hash-table :test #'equal)
+        for pair being the hash-keys in pc using (hash-value v)
+        do (if (gethash (char pair 0) counts)
+               (incf (gethash (char pair 0) counts)  v)
+               (setf  (gethash (char pair 0) counts) v))
+        finally (progn
+                  ;; count also the last character in the template:
+                  (incf (gethash (aref template (1- (length template))) counts))
+                  (return counts))))
 
-;;part 1
-(score  (let ((input (read-input)))
-          (apply-rules-n (input-rules input) (input-string input) 6)))
 
-;;part2
-(score  (let ((input (read-input)))
-          (apply-rules-n (input-rules input) (input-string input) 40)))
+(defun solve (count)
+  (let* ((input (read-input))
+         (rules (input-rules input))
+         (template (input-string input))
+         (pc (template-to-pairs-count template rules)))
+    (dotimes (i count) (setf pc (next-pairs-count pc rules)))
+    (loop for entry being the hash-keys in (score pc template) using (hash-value v)
+          maximizing v into max
+          minimizing v into min
+          finally (return (- max min)))))
+
+;; part1
+(solve 10)
+
+;; part2
+(solve 40)
