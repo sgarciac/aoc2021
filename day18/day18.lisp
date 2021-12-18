@@ -145,3 +145,21 @@
               (loop for line = (read-line stream nil) while line
                     for tree = (parse-line line) then (add-trees-and-reduce tree (parse-line line))
                     finally (return tree))))
+
+;; part 2
+(defun clone-tree (bt)
+  (if (leafp bt)
+      (make-tree :)
+      )
+  )
+
+(with-open-file (stream *input-file*)
+  (let ((lines (loop for line = (read-line stream nil) while line collect line)))
+    (loop for line1 in lines
+          for i = 0 then (1+ i)
+          maximizing (loop for line2 in lines
+                           for j = 0 then (1+ j)
+                           when (not (= i j))
+                             maximizing
+                             (max (tree-score (add-trees-and-reduce (parse-line line1) (parse-line line2)))
+                                  (tree-score (add-trees-and-reduce (parse-line line2) (parse-line line1))))))))
