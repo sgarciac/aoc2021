@@ -147,11 +147,6 @@
                     finally (return tree))))
 
 ;; part 2
-(defun clone-tree (bt)
-  (if (leafp bt)
-      (make-tree :)
-      )
-  )
 
 (with-open-file (stream *input-file*)
   (let ((lines (loop for line = (read-line stream nil) while line collect line)))
